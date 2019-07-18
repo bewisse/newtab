@@ -34,3 +34,17 @@
 ## Forking and contribution
 
 Feel free to send pull requests to add new features. It will benefit everyone! That said, I reserve the rights to reject pull requests that does not seem useful, or if they add too much complexity for very little benefits.
+
+## Development
+
+For development, run:
+```
+npm run dev
+```
+
+Add the build/ directory to Chrome.
+
+To deploy, run:
+```
+npm run build
+```
