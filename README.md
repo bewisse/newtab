@@ -4,14 +4,14 @@
   Smart New Tab gives you quick access to what you need in your New Tab screen.
 </h3>
 <h3 align="center">
-  <img src="https://yante-newtab.appspot.com/android-icon-96x96.png" width="24px" alt="ModHeader" />
-  <a href="https://yante-newtab.appspot.com/">
+  <img src="https://bewisse.com/newtab/icon-180.png" width="24px" alt="Smart New tab" />
+  <a href="https://bewisse.com/newtab/">
     Official Website
   </a>
 </h3>
 <p align="center">
   <a href="https://chrome.google.com/webstore/detail/yante-new-tab/ppbaflbhifnaoimjkaogodphnbhdgmfi">
-    <img src="https://yante-newtab.appspot.com/images/chrome_1x.png" srcset="https://yante-newtab.appspot.com/images/chrome_2x.png 2x">
+    <img src="https://bewisse.com/chrome_1x.png" srcset="https://bewisse.com/chrome_2x.png 2x">
   </a>
 </p>
 
@@ -29,7 +29,7 @@
 
 ## Screenshots
 
-<img src="http://yante-newtab.appspot.com/images/screenshot1.png">
+<img src="http://bewisse.com/newtab/screenshot1.png">
 
 ## Forking and contribution
 
