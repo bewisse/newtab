@@ -1,9 +1,9 @@
 
 module.exports = {
   name: 'Smart New Tab',
-  version: '1.0.6',
+  version: '1.0.7',
   description: 'A smarter new tab page for everyone',
-  author: 'hao1300@gmail.com',
+  author: 'support@bewisse.com',
   manifest_version: 2,
   icons: { '16': 'icons/16.png', '128': 'icons/128.png' },
   browser_action: {
