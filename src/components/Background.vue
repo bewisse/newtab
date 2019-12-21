@@ -6,7 +6,7 @@
         <a href="https://www.google.com/search?q=weather"
             v-if="weather"
             class="link no-underline display-2">
-          {{weather.degree}}{{weather.unit}}
+          {{weather.degree}}
           <img :src="`https://${weather.icon}`" width="32px" height="32px" />
         </a>
       </div>

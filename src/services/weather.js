@@ -2,7 +2,7 @@ class WeatherService {
   getCurrentWeather() {
     return fetch(
       'https://www.google.com/complete/search' +
-        '?q=weather&xssi=t&client=mobile-gws-wiz-hp&psi=',
+        '?cp=7&q=weather&xssi=t&client=mobile-gws-wiz-serp&psi=',
       {
         credentials: 'include',
         mode: 'cors'
@@ -21,10 +21,9 @@ class WeatherService {
         const weatherResult = firstResult[3].ansa.l[1].il
         const weather = {
           degree: weatherResult.t[0].t,
-          unit: weatherResult.t[1].t,
           icon: weatherResult.i.d
         }
-        if (weather.degree && weather.unit && weather.icon) {
+        if (weather.degree && weather.icon) {
           return weather
         }
         return null
