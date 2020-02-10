@@ -73,10 +73,14 @@ export default {
   },
 
   created() {
-    if (chrome.topSites) {
-      this.hasPermission = true
-      this.refresh()
-    }
+    chrome.permissions.contains({
+      permissions: ['topSites']
+    }, result => {
+      if (result) {
+        this.hasPermission = true
+        this.refresh()
+      }
+    })
   },
 
   methods: {

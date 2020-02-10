@@ -67,10 +67,14 @@ export default {
   },
 
   created() {
-    if (chrome.management) {
-      this.hasPermission = true
-      this.refresh()
-    }
+    chrome.permissions.contains({
+      permissions: ['management']
+    }, result => {
+      if (result) {
+        this.hasPermission = true
+        this.reset()
+      }
+    })
   },
 
   methods: {
@@ -80,7 +84,7 @@ export default {
       }, granted => {
         if (granted) {
           this.hasPermission = true
-          this.refresh()
+          this.reset()
         }
       })
     },
