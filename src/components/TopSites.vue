@@ -1,6 +1,7 @@
 <template>
   <v-layout justify-center wrap class="topsites">
     <draggable v-model="topSites"
+        v-if="hasPermission"
         class="d-inline"
         @end="onDragEnd()"
         :options="{draggable:'.item'}">  
@@ -25,6 +26,11 @@
             :imageUrl="require('./assets/baseline-add-24px.svg')" />
       </editshortcutdialog>
     </draggable>
+    <div v-else>
+      <v-btn @click="requestPermission" color="primary">
+        Show top sites
+      </v-btn>
+    </div>
   </v-layout>
 </template>
 
@@ -61,15 +67,29 @@ export default {
 
   data() {
     return {
-      topSites: []
+      topSites: [],
+      hasPermission: false
     }
   },
 
   created() {
-    this.refresh()
+    if (chrome.topSites) {
+      this.hasPermission = true
+      this.refresh()
+    }
   },
 
   methods: {
+    requestPermission() {
+      chrome.permissions.request({
+        permissions: ['topSites']
+      }, granted => {
+        if (granted) {
+          this.hasPermission = true
+          this.refresh()
+        }
+      })
+    },
     refresh() {
       suggestionService.suggestTopSites().then(topSites => {
         chrome.storage.local.get(['topSitesOrder'], (result) => {

@@ -1,7 +1,7 @@
 
 module.exports = {
   name: 'Smart New Tab',
-  version: '1.0.7',
+  version: '1.1.0',
   description: 'A smarter new tab page for everyone',
   author: 'support@bewisse.com',
   manifest_version: 2,
@@ -17,13 +17,15 @@ module.exports = {
   permissions: [
     'chrome://favicon/',
     'https://www.google.com/*',
+    'storage',
+    'activeTab'
+  ],
+  optional_permissions: [
     'clipboardRead',
+    'topSites',
     'history',
     'management',
-    'sessions',
-    'storage',
-    'tabs',
-    'topSites'
+    'sessions'
   ],
   chrome_url_overrides: {
     newtab: 'pages/newtab.html'

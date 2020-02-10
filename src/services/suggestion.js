@@ -63,7 +63,7 @@ class SuggestionService {
             type: TYPE_RECENT_SEARCH
           })
         }
-        return items
+        return items.slice(0, 5)
       })
       .catch(e => {
         return []
@@ -136,12 +136,12 @@ class SuggestionService {
             })
           }
         }
-        return items.slice(0, 10)
+        return items.slice(0, 5)
       })
   }
 
   suggestHistory() {
-    const MAX_HISTORY_SUGGESTIONS = 15
+    const MAX_HISTORY_SUGGESTIONS = 10
     const historyPromise = new Promise((resolve, reject) => {
       chrome.history.search({text: ''}, historyItems => {
         let items = []

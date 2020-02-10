@@ -1,6 +1,9 @@
 <template>
   <v-layout justify-center wrap>
-    <draggable v-model="apps" @end="onDragEnd()">
+    <draggable
+        v-model="apps"
+        v-if="hasPermission"
+        @end="onDragEnd()">
       <v-btn icon
           :large="$vuetify.breakpoint.mdAndUp"
           @click="openApp(app)"
@@ -36,6 +39,11 @@
         </v-list-tile>
       </v-list>
     </v-menu>
+    <div v-if="!hasPermission">
+      <v-btn @click="requestPermission" color="primary">
+        Show apps
+      </v-btn>
+    </div>
   </v-layout>
 </template>
 
@@ -53,15 +61,30 @@ export default {
       menuX: 0,
       menuY: 0,
       selectedApp: {},
-      showMenu: false
+      showMenu: false,
+      hasPermission: false
     }
   },
 
   created() {
-    this.reset()
+    if (chrome.management) {
+      this.hasPermission = true
+      this.refresh()
+    }
   },
 
   methods: {
+    requestPermission() {
+      chrome.permissions.request({
+        permissions: ['management']
+      }, granted => {
+        if (granted) {
+          this.hasPermission = true
+          this.refresh()
+        }
+      })
+    },
+
     getLargestIcon_(icons) {
       let largestIcon = null
       for (let icon of icons) {

@@ -1,5 +1,20 @@
 <template>
   <v-card color="rgba(255, 255, 255, 0)" class="content">
+    <v-btn @click="requestPermission('clipboardRead')"
+        color="primary"
+        v-if="!permissions.includes('clipboardRead')">
+      Show clipboard
+    </v-btn>
+    <v-btn @click="requestPermission('sessions')"
+        color="primary"
+        v-if="!permissions.includes('sessions')">
+      Show recently closed sessions
+    </v-btn>
+    <v-btn @click="requestPermission('history')"
+        color="primary"
+        v-if="!permissions.includes('history')">
+      Show recent history
+    </v-btn>
     <v-list subheader
         class="transparent"
         :dense="$vuetify.breakpoint.mdAndDown"
@@ -51,7 +66,8 @@ export default {
       clipboard: [],
       recentSearches: [],
       recentSessions: [],
-      history: []
+      history: [],
+      permissions: []
     }
   },
 
@@ -84,19 +100,36 @@ export default {
   },
 
   created() {
-    this.refreshSuggestions()
+    chrome.permissions.getAll(result => {
+      this.permissions = result.permissions
+      this.refreshSuggestions()
+    })
   },
 
   methods: {
+    requestPermission(permission) {
+      chrome.permissions.request({
+        permissions: [permission]
+      }, granted => {
+        if (granted) {
+          this.permissions.push(permission)
+          this.refresh()
+        }
+      })
+    },
+
     refreshSuggestions() {
       const initialY = window.scrollY
-      const allPromises = [
+      const allPromises = []
+      if (this.permissions.includes('clipboardRead')) {
         suggestionService.suggestClipboard().then(items => {
           this.clipboard = items
-        }),
-        suggestionService.suggestRecentSearches().then(items => {
-          this.recentSearches = items
-        }),
+        })
+      }
+      suggestionService.suggestRecentSearches().then(items => {
+        this.recentSearches = items
+      })
+      if (this.permissions.includes('sessions')) {
         suggestionService.suggestRecentSessions().then(items => {
           if (items.length > 0) {
             this.recentSessions = items
@@ -106,10 +139,13 @@ export default {
               this.recentSessions = items
             })
           }, 3000)
-        }),
+        })
+      }
+      if (this.permissions.includes('history')) {
         suggestionService.suggestHistory().then(items => {
           this.history = items
-        })]
+        })
+      }
       Promise.all(allPromises).then(() => {
         window.scrollTo(0, initialY)
       })
