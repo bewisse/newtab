@@ -13,6 +13,9 @@ module.exports = {
     '64': 'icons/64.png',
     '128': 'icons/128.png'
   },
+  background: {
+    scripts: ['background.js']
+  },
   browser_action: {
     default_icon: {
       '16': 'icons/16.png',
@@ -29,6 +32,7 @@ module.exports = {
     'storage'
   ],
   optional_permissions: [
+    'tabs',
     'clipboardRead',
     'topSites',
     'history',

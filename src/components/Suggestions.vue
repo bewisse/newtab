@@ -1,16 +1,16 @@
 <template>
   <v-card color="rgba(255, 255, 255, 0)" class="content">
-    <v-btn @click="requestPermission('clipboardRead')"
+    <v-btn @click="requestPermission(['clipboardRead'])"
         color="primary"
         v-if="!permissions.includes('clipboardRead')">
       Show clipboard
     </v-btn>
-    <v-btn @click="requestPermission('sessions')"
+    <v-btn @click="requestPermission(['sessions', 'tabs'])"
         color="primary"
         v-if="!permissions.includes('sessions')">
       Show recently closed sessions
     </v-btn>
-    <v-btn @click="requestPermission('history')"
+    <v-btn @click="requestPermission(['history'])"
         color="primary"
         v-if="!permissions.includes('history')">
       Show recent history
@@ -107,13 +107,13 @@ export default {
   },
 
   methods: {
-    requestPermission(permission) {
+    requestPermission(permissions) {
       chrome.permissions.request({
-        permissions: [permission]
+        permissions
       }, granted => {
         if (granted) {
-          this.permissions.push(permission)
-          this.refresh()
+          this.permissions.push(...permissions)
+          this.refreshSuggestions()
         }
       })
     },

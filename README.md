@@ -1,19 +1,14 @@
 # Smart New Tab Chrome Extension
 
-<h3 align="center">
-  Smart New Tab gives you quick access to what you need in your New Tab screen.
-</h3>
-<h3 align="center">
-  <img src="https://bewisse.com/newtab/icon-180.png" width="24px" alt="Smart New tab" />
+<h2 align="center">
   <a href="https://bewisse.com/newtab/">
-    Official Website
+    <img src="https://static.bewisse.com/newtab/icon_128.png" width="24px" alt="Smart New tab" />
+    Smart New tab
   </a>
+</h2>
+<h3 align="center">
+  Everything you use in one place.
 </h3>
-<p align="center">
-  <a href="https://chrome.google.com/webstore/detail/yante-new-tab/ppbaflbhifnaoimjkaogodphnbhdgmfi">
-    <img src="https://bewisse.com/chrome_1x.png" srcset="https://bewisse.com/chrome_2x.png 2x">
-  </a>
-</p>
 
 ## Features
 
@@ -29,7 +24,7 @@
 
 ## Screenshots
 
-<img src="http://bewisse.com/newtab/screenshot1.png">
+<img src="https://static.bewisse.com/newtab/screenshot1.png">
 
 ## Forking and contribution
 
