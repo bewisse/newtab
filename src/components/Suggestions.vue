@@ -15,35 +15,43 @@
         v-if="!permissions.includes('history')">
       Show recent history
     </v-btn>
-    <v-list subheader
-        class="transparent"
-        :dense="$vuetify.breakpoint.mdAndDown"
+    <v-list
+        class="pa-0"
         v-for="(suggestion, suggestionIndex) in suggestions"
         :key="suggestionIndex">
-      <v-subheader>{{suggestion.title}}</v-subheader>
-      <v-list-tile
-          v-for="(item, itemIndex) in suggestion.items"
-          :key="itemIndex"
-          avatar
-          :href="!item.requireClickHandler ? item.metadata : ''"
-          @click="item.requireClickHandler ? open(item, $event) : ''">
-        <v-list-tile-avatar>
-          <v-icon large v-if="item.icon">{{item.icon}}</v-icon>
-          <img :src="item.imageUrl" v-if="item.imageUrl">
-        </v-list-tile-avatar>
+      <v-list-group
+          :value="suggestion.visible"
+          @click="saveSuggestionState(suggestion)">
+        <template v-slot:activator>
+          <v-list-tile>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ suggestion.title }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </template>
+        <v-list-tile
+            v-for="(item, itemIndex) in suggestion.items"
+            :key="itemIndex"
+            avatar
+            :href="!item.requireClickHandler ? item.metadata : ''"
+            @click="item.requireClickHandler ? open(item, $event) : ''">
+          <v-list-tile-avatar>
+            <v-icon large v-if="item.icon">{{item.icon}}</v-icon>
+            <img :src="item.imageUrl" v-if="item.imageUrl">
+          </v-list-tile-avatar>
 
-        <v-list-tile-content>
-          <v-list-tile-title v-text="item.title"></v-list-tile-title>
-          <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
-        </v-list-tile-content>
+          <v-list-tile-content>
+            <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
+          </v-list-tile-content>
 
-        <v-list-tile-action @click.stop.prevent='remove(item)' v-if='item.deletionToken'>
-          <v-icon color="gray">
-            clear
-          </v-icon>
-        </v-list-tile-action>
-      </v-list-tile>
-      <v-divider v-if="suggestionIndex != suggestions.length - 1"></v-divider>
+          <v-list-tile-action @click.stop.prevent='remove(item)' v-if='item.deletionToken'>
+            <v-icon color="gray">
+              clear
+            </v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+      </v-list-group>
     </v-list>
   </v-card>
 </template>
@@ -58,6 +66,7 @@
 
 
 <script>
+import lodashGet from 'lodash/get'
 import suggestionService from '../services/suggestion'
 
 export default {
@@ -80,18 +89,26 @@ export default {
         }
       }
       addSuggestionIfNotEmpty({
+        id: 'clipboard',
+        visible: lodashGet(this.storageResult, ['clipboard', 'visible'], true),
         title: 'Clipboard',
         items: this.clipboard
       })
       addSuggestionIfNotEmpty({
+        id: 'search',
+        visible: lodashGet(this.storageResult, ['search', 'visible'], true),
         title: 'Recent search',
         items: this.recentSearches
       })
       addSuggestionIfNotEmpty({
+        id: 'sessions',
+        visible: lodashGet(this.storageResult, ['sessions', 'visible'], true),
         title: 'Recently closed',
         items: this.recentSessions
       })
       addSuggestionIfNotEmpty({
+        id: 'history',
+        visible: lodashGet(this.storageResult, ['history', 'visible'], true),
         title: 'History',
         items: this.history
       })
@@ -100,13 +117,20 @@ export default {
   },
 
   created() {
-    chrome.permissions.getAll(result => {
-      this.permissions = result.permissions
-      this.refreshSuggestions()
+    chrome.storage.sync.get(['clipboard', 'search', 'sessions', 'history'], (result) => {
+      this.storageResult = result
+      chrome.permissions.getAll(result => {
+        this.permissions = result.permissions
+        this.refreshSuggestions()
+      })
     })
   },
 
   methods: {
+    saveSuggestionState(suggestion) {
+      suggestion.visible = !suggestion.visible
+      chrome.storage.sync.set({ [suggestion.id]: { visible: suggestion.visible } })
+    },
     requestPermission(permissions) {
       chrome.permissions.request({
         permissions

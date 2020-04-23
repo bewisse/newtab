@@ -12,9 +12,7 @@
       </section>
     </v-content>
       
-    <v-footer color='rgba(0, 0, 0, .8)' dark height="auto" fixed>
-      <apps />
-    </v-footer>
+    <apps />
   </v-app>
 </template>
 

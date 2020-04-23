@@ -1,50 +1,52 @@
 <template>
-  <v-layout justify-center wrap>
-    <draggable
-        v-model="apps"
-        v-if="hasPermission"
-        @end="onDragEnd()">
-      <v-btn icon
-          :large="$vuetify.breakpoint.mdAndUp"
-          @click="openApp(app)"
-          @contextmenu.prevent="showContextMenu($event, app)"
-          v-for="app in apps"
-          :key="app.id"
-          :title="app.title">
-        <img :src="app.icon" :alt="app.title" width="80%" height="80%">
-      </v-btn>
-    </draggable>
-    <v-menu
-        v-model="showMenu"  
-        :position-x="menuX"
-        :position-y="menuY"
-        absolute
-        offset-y>
-      <v-list>
-        <v-list-tile @click="openApp(selectedApp)">
-          <v-list-tile-title class="font-weight-bold">
-            {{selectedApp.title}}
-          </v-list-tile-title>
-        </v-list-tile>
-        <v-divider></v-divider>
-        <v-list-tile v-if="selectedApp.optionsUrl"
-            @click="goToOptions(selectedApp)">
-          <v-list-tile-title>Options</v-list-tile-title>
-        </v-list-tile>
-        <v-list-tile @click="uninstall(selectedApp)">
-          <v-list-tile-title>Remove from Chrome...</v-list-tile-title>
-        </v-list-tile>
-        <v-list-tile @click="createShortcut(selectedApp)">
-          <v-list-tile-title>Create shortcuts...</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-menu>
-    <div v-if="!hasPermission">
-      <v-btn @click="requestPermission" color="primary">
-        Show apps
-      </v-btn>
-    </div>
-  </v-layout>
+  <v-footer color='rgba(0, 0, 0, .8)' dark height="auto" fixed v-if="!hasPermission || apps.length > 0">
+    <v-layout justify-center wrap>
+      <draggable
+          v-model="apps"
+          v-if="hasPermission"
+          @end="onDragEnd()">
+        <v-btn icon
+            :large="$vuetify.breakpoint.mdAndUp"
+            @click="openApp(app)"
+            @contextmenu.prevent="showContextMenu($event, app)"
+            v-for="app in apps"
+            :key="app.id"
+            :title="app.title">
+          <img :src="app.icon" :alt="app.title" width="80%" height="80%">
+        </v-btn>
+      </draggable>
+      <v-menu
+          v-model="showMenu"  
+          :position-x="menuX"
+          :position-y="menuY"
+          absolute
+          offset-y>
+        <v-list>
+          <v-list-tile @click="openApp(selectedApp)">
+            <v-list-tile-title class="font-weight-bold">
+              {{selectedApp.title}}
+            </v-list-tile-title>
+          </v-list-tile>
+          <v-divider></v-divider>
+          <v-list-tile v-if="selectedApp.optionsUrl"
+              @click="goToOptions(selectedApp)">
+            <v-list-tile-title>Options</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="uninstall(selectedApp)">
+            <v-list-tile-title>Remove from Chrome...</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="createShortcut(selectedApp)">
+            <v-list-tile-title>Create shortcuts...</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <div v-if="!hasPermission">
+        <v-btn @click="requestPermission" color="primary">
+          Show apps
+        </v-btn>
+      </div>
+    </v-layout>
+  </v-footer>
 </template>
 
 <script>

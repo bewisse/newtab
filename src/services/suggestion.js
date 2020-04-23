@@ -55,6 +55,9 @@ class SuggestionService {
             deletionToken = `https://www.google.com${token[3].du}`
           }
           const simpleTerm = term.replace('<b>', '').replace('</b>', '')
+          if (!simpleTerm) {
+            continue
+          }
           items.push({
             title: simpleTerm,
             deletionToken: deletionToken,
@@ -70,7 +73,7 @@ class SuggestionService {
       })
   }
 
-  suggestRecentSessions() {
+  async suggestRecentSessions() {
     const allDevicesPromise = new Promise((resolve, reject) => {
       chrome.sessions.getDevices({}, devices => {
         resolve(devices)
@@ -84,63 +87,61 @@ class SuggestionService {
         }])
       })
     })
-    return Promise.all([currentDevicePromise, allDevicesPromise])
-      .then(([currentDevice, allDevices]) => {
-        const devices = currentDevice.concat(allDevices)
-        let items = []
-        let sessionIds = new Set()
-        for (let device of devices) {
-          const sessions = device.sessions.slice(0, 6)
-          for (let session of sessions) {
-            let title = null
-            let metadata = null
-            let url = null
-            let imageUrl = null
-            let icon = null
-            let tab = session.tab
-            let win = session.window
-            if (!tab && win && win.tabs && win.tabs.length === 1) {
-              tab = win.tabs[0]
-            }
-            if (tab) {
-              if (device.deviceName) {
-                title = `[${device.deviceName}] ${tab.title}`
-              } else {
-                title = tab.title
-              }
-              metadata = tab.sessionId
-              url = tab.url
-              if (tab.favIconUrl) {
-                imageUrl = tab.favIconUrl
-              } else {
-                icon = 'insert_drive_file'
-              }
-            } else {
-              const window = session.window
-              title = `Restore window with ${window.tabs.length} tabs`
-              metadata = window.sessionId
-              icon = 'restore_page'
-            }
-            if (sessionIds.has(metadata)) {
-              continue
-            }
-            sessionIds.add(metadata)
-            items.push({
-              title: title,
-              metadata: metadata,
-              subtitle: url,
-              imageUrl: imageUrl,
-              icon: icon,
-              requireClickHandler: true,
-              type: TYPE_RECENT_SESSION
-            })
-          }
+    const [currentDevice, allDevices] = await Promise.all([currentDevicePromise, allDevicesPromise])
+    const devices = currentDevice.concat(allDevices)
+    let items = []
+    let sessionIds = new Set()
+    for (let device of devices) {
+      const sessions = device.sessions.slice(0, 6)
+      for (let session of sessions) {
+        let title = null
+        let metadata = null
+        let url = null
+        let imageUrl = null
+        let icon = null
+        let tab = session.tab
+        let win = session.window
+        if (!tab && win && win.tabs && win.tabs.length === 1) {
+          tab = win.tabs[0]
         }
-        return items.slice(0, 5)
-      })
+        if (tab) {
+          if (device.deviceName) {
+            title = `[${device.deviceName}] ${tab.title}`
+          } else {
+            title = tab.title
+          }
+          metadata = tab.sessionId
+          url = tab.url
+          if (tab.favIconUrl) {
+            imageUrl = tab.favIconUrl
+          } else {
+            icon = 'insert_drive_file'
+          }
+        } else {
+          const window = session.window
+          title = `Restore window with ${window.tabs.length} tabs`
+          metadata = window.sessionId
+          icon = 'restore_page'
+        }
+        if (!title || sessionIds.has(metadata)) {
+          continue
+        }
+        sessionIds.add(metadata)
+        items.push({
+          title: title,
+          metadata: metadata,
+          subtitle: url,
+          imageUrl: imageUrl,
+          icon: icon,
+          requireClickHandler: true,
+          type: TYPE_RECENT_SESSION
+        })
+      }
+    }
+    return items.slice(0, 5)
   }
 
-  suggestHistory() {
+  async suggestHistory() {
     const MAX_HISTORY_SUGGESTIONS = 10
     const historyPromise = new Promise((resolve, reject) => {
       chrome.history.search({text: ''}, historyItems => {
@@ -148,7 +149,7 @@ class SuggestionService {
         let urls = new Set()
         for (let item of historyItems) {
           const hostname = this.extractHostname_(item.url)
-          if (!item.url || urls.has(hostname)) {
+          if (!item.title || !item.url || urls.has(hostname)) {
             continue
           }
           urls.add(hostname)
@@ -165,33 +166,26 @@ class SuggestionService {
       })
     })
     const recentSessionsPromise = this.suggestRecentSessions()
-    return Promise.all([historyPromise, recentSessionsPromise]).then(promises => {
-      let history = promises[0]
-      const recentSessions = promises[1]
-      let urls = new Set()
-      for (let session of recentSessions) {
-        if (session.url) {
-          urls.add(this.extractHostname_(session.url))
-        }
+    const [history, recentSessions] = await Promise.all([historyPromise, recentSessionsPromise])
+    let urls = new Set()
+    for (let session of recentSessions) {
+      if (session.url) {
+        urls.add(this.extractHostname_(session.url))
       }
-      history = history.filter(item => !urls.has(this.extractHostname_(item.url)))
-      return history.slice(0, MAX_HISTORY_SUGGESTIONS)
-    })
+    }
+    return history.filter(item => !urls.has(this.extractHostname_(item.url))).slice(0, MAX_HISTORY_SUGGESTIONS)
   }
 
-  suggestTopSites() {
-    return topSitesService.getTopSites().then(topSites => {
-      return topSites.map(topSite => {
-        return {
-          title: topSite.title,
-          metadata: topSite.url,
-          url: topSite.url,
-          deletionToken: topSite,
-          imageUrl: `chrome://favicon/size/32@2x/${topSite.url}`,
-          type: TYPE_TOP_SITES
-        }
-      })
-    })
+  async suggestTopSites() {
+    const topSites = await topSitesService.getTopSites()
+    return topSites.map(topSite => ({
+      title: topSite.title,
+      metadata: topSite.url,
+      url: topSite.url,
+      deletionToken: topSite,
+      imageUrl: `chrome://favicon/size/32@2x/${topSite.url}`,
+      type: TYPE_TOP_SITES
+    }))
   }
 
   open(suggestion, {openAsNewTab} = {}) {
