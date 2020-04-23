@@ -1,7 +1,7 @@
 
 module.exports = {
   name: 'Smart New Tab',
-  version: '1.1.0',
+  version: '1.1.1',
   description: 'A smarter new tab page for everyone',
   author: 'support@bewisse.com',
   manifest_version: 2,
