@@ -20,9 +20,9 @@ module.exports = merge(baseWebpack, {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new OptimizeCSSPlugin({
-      cssProcessorOptions: { discardComments: { removeAll: true } },
-    }),
+    // new OptimizeCSSPlugin({
+    //   cssProcessorOptions: { discardComments: { removeAll: true } },
+    // }),
     new ExtractTextPlugin({
       filename: 'css/[name].[contenthash].css'
     }),
