@@ -34,11 +34,13 @@ class BackgroundImageService {
         if (result.background) {
           let images = result.background
           let nextImage = images[0]
-          if (images.length > 1) {
-            this.preloadImage_(images[0])
+          if (nextImage.src) {
+            if (images.length > 1) {
+              this.preloadImage_(images[0])
+            }
+            resolve(nextImage)
+            return
           }
-          resolve(nextImage)
-          return
         }
         this.downloadImages_().then(images => {
           chrome.storage.local.set({ background: images })
@@ -82,7 +84,7 @@ class BackgroundImageService {
       .then(result => {
         return result.map(image => {
           return {
-            src: image.urls.custom,
+            src: image.urls.regular,
             link: image.links.html,
             download: image.links.download_location,
             user: image.user.name,
